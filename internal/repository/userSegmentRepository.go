@@ -14,6 +14,7 @@ type UserSegmentRepository interface {
 	Update(us *models.UserSegment) (*models.UserSegment, error)
 	Create(us *models.UserSegment) (*models.UserSegment, error)
 	Delete(us *models.UserSegment) error
+	FindAllById(id int, active bool) ([]models.UserSegment, error)
 }
 
 type UserSegmentDB struct {
@@ -44,12 +45,24 @@ func (usdb *UserSegmentDB) FindAll(active bool) ([]models.UserSegment, error) {
 		return nil, err
 	}
 	defer rows.Close()
+	return scanForResult(rows)
+}
 
+func (usdb *UserSegmentDB) FindAllById(id int, active bool) ([]models.UserSegment, error) {
+	rows, err := usdb.Query("SELECT * FROM user_segment as us WHERE us.id = $1 and us.active = $2", id, active)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanForResult(rows)
+}
+
+func scanForResult(rows *sql.Rows) ([]models.UserSegment, error) {
 	arrayUS := []models.UserSegment{}
 
 	for rows.Next() {
 		userSegment := models.UserSegment{}
-		err = rows.Scan(
+		err := rows.Scan(
 			&userSegment.Id,
 			&userSegment.User_id,
 			&userSegment.Segment_id,
@@ -64,7 +77,7 @@ func (usdb *UserSegmentDB) FindAll(active bool) ([]models.UserSegment, error) {
 		arrayUS = append(arrayUS, userSegment)
 	}
 
-	if err = rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 

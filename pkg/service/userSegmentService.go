@@ -12,3 +12,12 @@ import "github.com/Bionic2113/avito/internal/models"
 func UpdateUserSegments(id int, add []string, del []string) ([]models.UserSegment, error){
  return nil, nil
 } 
+
+func contains(str string, arr []string) bool{
+  for _, s := range arr{
+	if str == s{
+	  return true
+	}
+  }
+  return false
+}

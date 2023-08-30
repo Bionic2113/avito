@@ -78,6 +78,21 @@ func (mr *MockUserSegmentRepositoryMockRecorder) FindAll(active interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockUserSegmentRepository)(nil).FindAll), active)
 }
 
+// FindAllById mocks base method.
+func (m *MockUserSegmentRepository) FindAllById(id int, active bool) ([]models.UserSegment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindAllById", id, active)
+	ret0, _ := ret[0].([]models.UserSegment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindAllById indicates an expected call of FindAllById.
+func (mr *MockUserSegmentRepositoryMockRecorder) FindAllById(id, active interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAllById", reflect.TypeOf((*MockUserSegmentRepository)(nil).FindAllById), id, active)
+}
+
 // FindById mocks base method.
 func (m *MockUserSegmentRepository) FindById(id int) (*models.UserSegment, error) {
 	m.ctrl.T.Helper()
