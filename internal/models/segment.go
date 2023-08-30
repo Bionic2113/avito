@@ -1,9 +1,9 @@
 package models
 
 type Segment struct {
-	Id   int    `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
-	// Time int64  `json:"time,omitempty"`
+	Id     uint64 `json:"id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Active bool   `json:"active,omitempty"`
 }
 
 // const (
