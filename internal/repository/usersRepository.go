@@ -61,9 +61,16 @@ func (udb *UserRepoDB) Update(u *models.User) (*models.User, error) {
 		log.Println("ошибка в создании транзакции")
 		return nil, err
 	}
-	_, err = udb.Exec("update users set id = $1, first_name = $2, last_name = $3, active = $4 where id = $1", u.Id, u.FirstName, u.LastName, u.Active)
+	row := udb.QueryRow(
+		"update users set id = $1, first_name = $2, last_name = $3, active = $4 where id = $1 returning *",
+		u.Id,
+		u.FirstName,
+		u.LastName,
+		u.Active,
+	)
+	err = row.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Active)
 	if err != nil {
-		log.Println("уже существует")
+		log.Println("error in scan")
 		tx.Rollback()
 		return nil, err
 	}
@@ -72,12 +79,7 @@ func (udb *UserRepoDB) Update(u *models.User) (*models.User, error) {
 		log.Println("ошибка в коммите")
 		return nil, err
 	}
-	u, err = udb.FindById(int(u.Id))
-	if err != nil {
-		return nil, err
-	}
 	return u, nil
-
 }
 
 func (udb *UserRepoDB) Create(u *models.User) (*models.User, error) {
@@ -86,7 +88,8 @@ func (udb *UserRepoDB) Create(u *models.User) (*models.User, error) {
 		log.Println("ошибка в создании транзакции")
 		return nil, err
 	}
-	_, err = udb.Exec("insert into users (first_name, last_name) values ($1, $2)", u.FirstName, u.LastName)
+	row := udb.QueryRow("insert into users (first_name, last_name) values ($1, $2) returning *", u.FirstName, u.LastName)
+	err = row.Scan(&u.Id, &u.FirstName, &u.LastName, &u.Active)
 	if err != nil {
 		log.Println("уже существует")
 		tx.Rollback()
@@ -97,17 +100,13 @@ func (udb *UserRepoDB) Create(u *models.User) (*models.User, error) {
 		log.Println("ошибка в коммите")
 		return nil, err
 	}
-	u, err = udb.FindById(int(u.Id))
-	if err != nil {
-		return nil, err
-	}
 	return u, nil
 }
 
 func (udb *UserRepoDB) Delete(u *models.User) error {
-	if _, err := udb.FindById(int(u.Id)); err != nil {
-		return err
-	}
+	// if _, err := udb.FindById(int(u.Id)); err != nil {
+	// 	return err
+	// }
 	tx, err := udb.Begin()
 	if err != nil {
 		return err

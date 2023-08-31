@@ -61,7 +61,9 @@ func (sdb *SegmentRepositoryDB) Create(name string) (*models.Segment, error) {
 		log.Println("ошибка в создании транзакции")
 		return nil, err
 	}
-	_, err = sdb.Exec("insert into segment (name) values ($1)", name)
+	s := &models.Segment{}
+	row := sdb.QueryRow("insert into segment (name) values ($1) returning *", name)
+	err = row.Scan(&s.Id, &s.Name, &s.Active)
 	if err != nil {
 		log.Println("уже существует")
 		tx.Rollback()
@@ -70,22 +72,19 @@ func (sdb *SegmentRepositoryDB) Create(name string) (*models.Segment, error) {
 	err = tx.Commit()
 	if err != nil {
 		log.Println("ошибка в коммите")
-		return nil, err
-	}
-	s, err := sdb.FindByName(name)
-	if err != nil {
 		return nil, err
 	}
 	return s, nil
 }
 
-func (sdb *SegmentRepositoryDB) Update(s *models.Segment) (*models.Segment, error) { 
+func (sdb *SegmentRepositoryDB) Update(s *models.Segment) (*models.Segment, error) {
 	tx, err := sdb.Begin()
 	if err != nil {
 		log.Println("ошибка в создании транзакции")
 		return nil, err
 	}
-	_, err = sdb.Exec("update segment set id = $1, name = $2, active = $3 where name $2", s.Id, s.Name, s.Active)
+	row := sdb.QueryRow("update segment set id = $1, name = $2, active = $3 where name $2 returning *", s.Id, s.Name, s.Active)
+	err = row.Scan(&s.Id, &s.Name, &s.Active)
 	if err != nil {
 		log.Println("уже существует")
 		tx.Rollback()
@@ -96,12 +95,8 @@ func (sdb *SegmentRepositoryDB) Update(s *models.Segment) (*models.Segment, erro
 		log.Println("ошибка в коммите")
 		return nil, err
 	}
-	s, err = sdb.FindByName(s.Name)
-	if err != nil {
-		return nil, err
-	}
 	return s, nil
-  }
+}
 
 func (sdb *SegmentRepositoryDB) Delete(name string) error {
 	// if _, err := sdb.FindByName(name); err != nil {
@@ -120,8 +115,8 @@ func (sdb *SegmentRepositoryDB) Delete(name string) error {
 		tx.Rollback()
 		return err
 	}
-	count , err := result.RowsAffected()
-	if count == 0 || err != nil{
+	count, err := result.RowsAffected()
+	if count == 0 || err != nil {
 		log.Println("Ошибка при RowsAffected:", err)
 		tx.Rollback()
 		return errors.New("not found")

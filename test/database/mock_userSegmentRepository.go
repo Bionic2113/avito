@@ -34,6 +34,18 @@ func (m *MockUserSegmentRepository) EXPECT() *MockUserSegmentRepositoryMockRecor
 	return m.recorder
 }
 
+// Cleaning mocks base method.
+func (m *MockUserSegmentRepository) Cleaning() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Cleaning")
+}
+
+// Cleaning indicates an expected call of Cleaning.
+func (mr *MockUserSegmentRepositoryMockRecorder) Cleaning() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Cleaning", reflect.TypeOf((*MockUserSegmentRepository)(nil).Cleaning))
+}
+
 // Create mocks base method.
 func (m *MockUserSegmentRepository) Create(us *models.UserSegment) (*models.UserSegment, error) {
 	m.ctrl.T.Helper()
@@ -64,18 +76,18 @@ func (mr *MockUserSegmentRepositoryMockRecorder) Delete(us interface{}) *gomock.
 }
 
 // FindAll mocks base method.
-func (m *MockUserSegmentRepository) FindAll(active bool) ([]models.UserSegment, error) {
+func (m *MockUserSegmentRepository) FindAll() ([]models.UserSegment, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAll", active)
+	ret := m.ctrl.Call(m, "FindAll")
 	ret0, _ := ret[0].([]models.UserSegment)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindAll indicates an expected call of FindAll.
-func (mr *MockUserSegmentRepositoryMockRecorder) FindAll(active interface{}) *gomock.Call {
+func (mr *MockUserSegmentRepositoryMockRecorder) FindAll() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockUserSegmentRepository)(nil).FindAll), active)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockUserSegmentRepository)(nil).FindAll))
 }
 
 // FindAllById mocks base method.

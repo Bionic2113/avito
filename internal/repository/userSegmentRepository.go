@@ -10,7 +10,8 @@ import (
 
 type UserSegmentRepository interface {
 	FindById(id int) (*models.UserSegment, error)
-	FindAll(active bool) ([]models.UserSegment, error)
+	FindAll() ([]models.UserSegment, error)
+	Cleaning() 
 	Update(us *models.UserSegment) (*models.UserSegment, error)
 	Create(us *models.UserSegment) (*models.UserSegment, error)
 	Delete(us *models.UserSegment) error
@@ -32,14 +33,22 @@ func (usdb *UserSegmentDB) FindById(id int) (*models.UserSegment, error) {
 	return userSegment, nil
 }
 
-func (usdb *UserSegmentDB) FindAll(active bool) ([]models.UserSegment, error) {
-	rows, err := usdb.Query("SELECT * FROM user_segment as us WHERE us.active = $1", active)
+func (usdb *UserSegmentDB) FindAll() ([]models.UserSegment, error) {
+	rows, err := usdb.Query("SELECT * FROM user_segment")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	return scanForResult(rows)
 }
+
+func (usdb *UserSegmentDB) Cleaning() {
+  _, err := usdb.Exec("UPDATE user_segment SET active = false, duration = 0, deletion_time = EXTRACT(epoch from now()) WHERE duration <= EXTRACT(epoch from now()) and duration != 0")
+	if err != nil{
+	  log.Println("Error in cleaning: ", err)
+	}
+}
+
 
 func (usdb *UserSegmentDB) FindAllById(user_id int, active bool) ([]models.UserSegment, error) {
 	rows, err := usdb.Query("SELECT * FROM user_segment as us WHERE us.User_id = $1 and us.active = $2", user_id, active)
@@ -56,8 +65,8 @@ func scanOne(row *sql.Row, userSegment *models.UserSegment) error {
 		&userSegment.User_id,
 		&userSegment.Segment_name,
 		&userSegment.CreationTime,
-		&sql.NullInt64{Valid: true, Int64: int64(userSegment.DeletionTime)},
-		&sql.NullInt64{Int64: int64(userSegment.Duration), Valid: true},
+		&userSegment.DeletionTime,
+		&userSegment.Duration,
 		&userSegment.Active,
 	)
 }
@@ -71,8 +80,8 @@ func scanForResult(rows *sql.Rows) ([]models.UserSegment, error) {
 			&userSegment.User_id,
 			&userSegment.Segment_name,
 			&userSegment.CreationTime,
-			&sql.NullInt64{Valid: true, Int64: int64(userSegment.DeletionTime)},
-			&sql.NullInt64{Int64: int64(userSegment.Duration), Valid: true},
+			&userSegment.DeletionTime,
+			&userSegment.Duration,
 			&userSegment.Active,
 		)
 		if err != nil {
@@ -95,7 +104,7 @@ func (usdb *UserSegmentDB) Update(us *models.UserSegment) (*models.UserSegment, 
 		return nil, err
 	}
 	result := usdb.QueryRow(
-		"update user_segment set id = $1, user_id = $2, segment_name = $3, creation_time = $4, deletion_time = $5, duration = $6, active = $7 where id = $1 returning *",
+		"update user_segment set user_id = $2, segment_name = $3, creation_time = $4, deletion_time = $5, duration = $6, active = $7 where id = $1 returning *",
 		us.Id,
 		us.User_id,
 		us.Segment_name,
@@ -115,13 +124,11 @@ func (usdb *UserSegmentDB) Update(us *models.UserSegment) (*models.UserSegment, 
 		log.Println("ошибка в коммите")
 		return nil, err
 	}
-	// us, err = usdb.FindById(int(us.Id))
-	// if err != nil {
-	// 	return nil, err
-	// }
 	return us, nil
 }
 
+// метод позволяет сам создать сегмент,
+// если его не было, но пользователя не создает
 func (usdb *UserSegmentDB) Create(us *models.UserSegment) (*models.UserSegment, error) {
 	tx, err := usdb.Begin()
 	if err != nil {
@@ -134,6 +141,10 @@ func (usdb *UserSegmentDB) Create(us *models.UserSegment) (*models.UserSegment, 
 			return nil, err
 		}
 	}
+	udb := UserRepoDB{usdb.DB}
+	if _, err := udb.FindById(int(us.User_id)); err != nil{
+	  return nil, err
+	}
 	result := usdb.QueryRow(
 		"insert into user_segment (user_id, segment_name) values ($1, $2) returning *",
 		us.User_id,
@@ -141,7 +152,6 @@ func (usdb *UserSegmentDB) Create(us *models.UserSegment) (*models.UserSegment, 
 	)
 	if err != nil {
 		log.Println("Ошибка при выполнении запроса:", err)
-		log.Println("уже существует")
 		tx.Rollback()
 		return nil, err
 	}
@@ -155,11 +165,6 @@ func (usdb *UserSegmentDB) Create(us *models.UserSegment) (*models.UserSegment, 
 		log.Println("ошибка в коммите")
 		return nil, err
 	}
-	// us, err = usdb.FindById(int(id))
-	// if err != nil {
-	// 	log.Println("Ошибка при получения чела:", err)
-	// 	return nil, err
-	// }
 	return us, nil
 }
 
