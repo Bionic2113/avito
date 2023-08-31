@@ -31,7 +31,7 @@ func TestTrackingForDeletion(t *testing.T) {
 		if err != nil {
 			t.Fatal("Error in create user_segment method: ", err)
 		}
-		require.Equal(t, true, user_segment.Active )
+		require.Equal(t, true, user_segment.Active)
 		user_segment.Duration = uint64(time.Now().Unix())
 		_, err = userSegmentRepo.Update(user_segment)
 		if err != nil {
@@ -39,17 +39,18 @@ func TestTrackingForDeletion(t *testing.T) {
 		}
 		time.Sleep(63 * time.Second)
 		u_arr, err := userSegmentRepo.FindAll()
-		if err != nil{
-		  t.Log("Никого не нашел: ", err)
+		if err != nil {
+			t.Log("Никого не нашел: ", err)
 		}
-		for i, v := range u_arr{
-		  fmt.Println(fmt.Sprintf("iter: %d, id=%d\nu_id=%d\nseg_n=%s\nct=%s\ncd=%s\ndur=%s\nactive=%v",
-		  i,v.Id,v.User_id,v.Segment_name,
-		  time.Unix(int64(v.CreationTime),0).String(),
-		  time.Unix(int64(v.DeletionTime),0).String(),
-		  time.Unix(int64(v.Duration),0).String(),
-		  v.Active,
-		))
+		for i, v := range u_arr {
+			fmt.Printf(
+				"iter: %d, id=%d\nu_id=%d\nseg_n=%s\nct=%s\ncd=%s\ndur=%s\nactive=%v",
+				i, v.Id, v.User_id, v.Segment_name,
+				time.Unix(int64(v.CreationTime), 0).String(),
+				time.Unix(int64(v.DeletionTime), 0).String(),
+				time.Unix(int64(v.Duration), 0).String(),
+				v.Active,
+			)
 		}
 		user_segment, err = userSegmentRepo.FindById(int(user_segment.Id))
 		if err != nil {

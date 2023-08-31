@@ -7,7 +7,7 @@ import (
 )
 
 type Message struct {
-	Id int
+	Id int `json:"id"`
 }
 
 // удаление пользователя

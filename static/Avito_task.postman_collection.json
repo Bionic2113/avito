@@ -1,0 +1,184 @@
+{
+	"info": {
+		"_postman_id": "6deb44d0-2e99-4463-8cce-db41dbaf0030",
+		"name": "Avito_task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26874662"
+	},
+	"item": [
+		{
+			"name": "/segment/delete",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"name\": \"A_TEST5\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/segment/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"segment",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user_segment/update",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\":1,\n    \"add\":[\"AVITO_CUP\",\"AVITO_AIR\"],\n    \"del\":[\"AVITO_VOICE_MESSAGES\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user_segment/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user_segment",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user_segment/history",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"year\": 2023,\n    \"month\": 8\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user_segment/history",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user_segment",
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user_segment/add_percent",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"segment_name\": \"ERROR\",\n    \"percent\": 333\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user_segment/add_percent",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user_segment",
+						"add_percent"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/segment/create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"CREATE_ME\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/segment/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"segment",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user_segment/active",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\":1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user_segment/active",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user_segment",
+						"active"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

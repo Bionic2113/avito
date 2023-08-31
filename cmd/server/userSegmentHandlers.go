@@ -120,6 +120,11 @@ func addPersentUsersForSegment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	if req.Percent > 100 || req.Percent < 0{	
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode("Invalid value")
+		return
+	}
 
 	res, err := userSegmnetService.AddPercent(req.SegmentName, req.Percent)
 	if err != nil {

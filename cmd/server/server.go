@@ -28,6 +28,7 @@ func StartServer(u repository.UserRepository, s repository.SegmentRepository, us
 	http.HandleFunc("/user_segment/update", updateSegmentsForUserHandler)
 	http.HandleFunc("/user_segment/active", activeUserSegmentsHandler)
 	http.HandleFunc("/user_segment/history", historySegmentsForUserHandler)
+	http.HandleFunc("/user_segment/add_percent", addPersentUsersForSegment)
 	go trackingForDeletion()
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", Port), nil))
 

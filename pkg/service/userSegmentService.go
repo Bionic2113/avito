@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
+	"math/rand"
 	"os"
 	"time"
 
@@ -70,25 +72,27 @@ func (service *Service) UpdateUserSegments(id int, add []string, del []string, d
 // для создания же по сути тебе надо только айди чела и название сегмента
 // поэтому вроде проблем в данных нет
 func (service *Service) create(id int, add []string, dur []uint64) []models.UserSegment {
-	for len(add) > len(dur){
-	  dur = append(dur, 0)
+	for len(add) > len(dur) {
+		dur = append(dur, 0)
 	}
 	create_array := make([]models.UserSegment, len(add))
 	for i, v := range add {
 		userSegment := &models.UserSegment{
 			User_id:      uint64(id),
 			Segment_name: v,
-			Duration: 0,
+			Duration:     0,
 		}
-		
+
 		userSegment, err := service.userSegmentRepo.Create(userSegment)
 		if err != nil {
 			userSegment = &models.UserSegment{Segment_name: "Error in the creation method"}
 		}
-		if dur[i] != 0{
-		    userSegment.Duration = uint64(time.Now().AddDate(0, 0, int(dur[i])).Unix())
+		if dur[i] != 0 {
+			userSegment.Duration = uint64(time.Now().AddDate(0, 0, int(dur[i])).Unix())
 			userS, err := service.userSegmentRepo.Update(userSegment)
-			if err == nil {userSegment = userS}
+			if err == nil {
+				userSegment = userS
+			}
 		}
 
 		create_array[i] = *userSegment
@@ -221,8 +225,28 @@ func (service *Service) CreateCSV(year, month int) string {
 	return filename
 }
 
-func (service *Service) AddPercent()([]models.UserSegment, error){
-  return nil,nil
+func (service *Service) AddPercent(segment_name string, percent int) ([]models.UserSegment, error) {
+	users, err := service.userRepo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	var count int = int(math.Round(float64(len(users)) / 100 * float64(percent)))
+	log.Println("count is ", count)
+	userSegmentArr := make([]models.UserSegment, count)
+	randomIndexes := rand.Perm(len(users))[:count]
+	log.Println("len randomIndexes: ", len(randomIndexes))
+	for i, index := range randomIndexes {
+		userSegmnet, err := service.userSegmentRepo.Create(&models.UserSegment{
+			Segment_name: segment_name,
+			User_id:      users[index].Id,
+		})
+		if err == nil {
+			userSegmentArr[i] = *userSegmnet
+		} else {
+			log.Println("Error in AddPercent: ", err)
+		}
+	}
+	return userSegmentArr, nil
 }
 
 func (service *Service) CleaningOld() {
