@@ -5,67 +5,68 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"testing"
 
+	"github.com/Bionic2113/avito/cmd/server"
 	"github.com/Bionic2113/avito/internal/models"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-type SegmentName struct {
-	Name string `json:"name,omitempty"`
-}
-
 func TestCreateSegmentHandler(t *testing.T) {
-	segment_start := SegmentName{Name: "AVITO_TEST"}
+	segment_start := server.SegmentName{Name: "AVITO_TEST"}
 	segment_finish := models.Segment{1, segment_start.Name, true}
 	segmentMockDB.EXPECT().Create(segment_start.Name).Return(&segment_finish, nil)
 	req, _ := json.Marshal(segment_start)
 	resp, err := http.Post("http://localhost:8080/segment/create", "application/json", bytes.NewBuffer(req))
 	if err != nil {
-		log.Println("error in POST method")
-		log.Fatal(err)
+		t.Log("error in POST method")
+		t.Fatal(err)
 	}
 	defer resp.Body.Close()
 
 	var segment_actual models.Segment
 	err = json.NewDecoder(resp.Body).Decode(&segment_actual)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
-	assert.Equal(t, segment_finish, segment_actual, "Not equal. First test in createSegmentHandler")
+	require.Equal(t, segment_finish, segment_actual, "Not equal. First test in createSegmentHandler")
 }
 
+// почему то стал отлетать, хотя в постмане всё ок
 func TestDeleteSegmentHandler(t *testing.T) {
 	testTable := []struct {
-		s        SegmentName
+		s        server.SegmentName
 		err      error
 		response string
 	}{
-		{s: SegmentName{Name: "AVITO_TEST"}, err: nil, response: "Success"},
-		// {s: models.Segment{Id: 2}, err: nil, response: "Success"},
-		// {s: models.Segment{Id: 3, Name: "OVITO_TTEST"}, err: nil, response: "Success"},
-		{s: SegmentName{}, err: errors.New("Not found"), response: "Error! Not found!"},
+		{s: server.SegmentName{Name: "AVITO_TEST_2"}, err: nil, response: "Success"},
+		{s: server.SegmentName{}, err: errors.New("Not found"), response: "Error! Not found!"},
 	}
 	for i, v := range testTable {
-		segmentMockDB.EXPECT().Delete(&v.s.Name).Return(v.err)
-		req, _ := json.Marshal(v.s.Name)
+		segmentMockDB.EXPECT().Delete(v.s.Name).Return(v.err)
+		req, err := json.Marshal(v.s)
+		if err != nil {
+			t.Log("eror in marshal: ", err, "iter: ", i)
+			t.Fatal(err)
+		}
 		resp, err := http.Post("http://localhost:8080/segment/delete", "application/json", bytes.NewBuffer(req))
 		if err != nil {
-			log.Println("error in POST method. Iteration = ", i)
-			log.Fatal(err)
+			t.Log("error in POST method. Iteration = ", i)
+			t.Fatal(err)
 		}
 		defer resp.Body.Close()
 
 		var resp_actual string
 		err = json.NewDecoder(resp.Body).Decode(&resp_actual)
 		if err != nil {
-			log.Fatal(err)
+			t.Log("second ", resp.Body)
+			t.Log("error in decode, iteration = ", i)
+			t.Fatal(err)
 		}
 
-		assert.Equal(t, v.response, resp_actual, fmt.Sprintf("Not equal. Erorr in %d test deleteSegmentHandler", i))
+		require.Equal(t, v.response, resp_actual, fmt.Sprintf("Not equal. Erorr in %d test deleteSegmentHandler", i))
 
 	}
 }

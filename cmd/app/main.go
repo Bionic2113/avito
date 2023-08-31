@@ -27,4 +27,11 @@ func init(){
 
 func main() {
 	server.StartServer(userRepo, segmentRepo, userSegmentRepo)
+	// u, err := userSegmentRepo.FindAllById(1, true)
+	// if err != nil{
+	//   log.Fatal(err)
+	// }
+	// for _,v := range u{
+	//   log.Println(v)
+	// }
 }

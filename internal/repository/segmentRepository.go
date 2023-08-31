@@ -104,27 +104,34 @@ func (sdb *SegmentRepositoryDB) Update(s *models.Segment) (*models.Segment, erro
   }
 
 func (sdb *SegmentRepositoryDB) Delete(name string) error {
-	if _, err := sdb.FindByName(name); err != nil {
-		return err
-	}
+	// if _, err := sdb.FindByName(name); err != nil {
+	// 	log.Println("Ошибка при выполнении запроса:", err)
+	// 	return err
+	// }
+	log.Println("start Delete()")
 	tx, err := sdb.Begin()
 	if err != nil {
+		log.Println("Ошибка при tx.Begin():", err)
 		return err
 	}
 	result, err := sdb.Exec("update segment set active = false where name = $1 and active = true", name)
 	if err != nil {
+		log.Println("Ошибка при выполнении запроса:", err)
 		tx.Rollback()
 		return err
 	}
 	count , err := result.RowsAffected()
 	if count == 0 || err != nil{
+		log.Println("Ошибка при RowsAffected:", err)
 		tx.Rollback()
 		return errors.New("not found")
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		log.Println("Ошибка при tx.Commit:", err)
 		return err
 	}
+	log.Println("finish Delete()")
 	return nil
 }

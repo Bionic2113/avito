@@ -2,7 +2,7 @@ package models
 
 type Segment struct {
 	Id     uint64 `json:"id,omitempty"`
-	Name   string `json:"name,omitempty"`
+	Name   string `json:"name"`
 	Active bool   `json:"active,omitempty"`
 }
 

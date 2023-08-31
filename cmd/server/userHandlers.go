@@ -12,17 +12,14 @@ type Message struct {
 
 // удаление пользователя
 func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
-
 }
 
 // создание пользователя
 func createUserHandler(w http.ResponseWriter, r *http.Request) {
-
 }
 
 // изменение данных пользователя
 func updateUserHandler(w http.ResponseWriter, r *http.Request) {
-
 }
 
 // найти юзера по id
@@ -39,7 +36,7 @@ func findUserByIdHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 
 	res, err := userRepo.FindById(req.Id)
@@ -47,29 +44,18 @@ func findUserByIdHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("не нашел")
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode("Not found")
-	}else{
+	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(res)
 	}
-
-	
 }
 
 // список всех юзеров
 func findAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-if r.Method != http.MethodPost {
+	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-
-	// decoder := json.NewDecoder(r.Body)
-	// var req Message
-	// err := decoder.Decode(&req)
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	return
-	// }
-	
 	w.Header().Set("Content-Type", "application/json")
 
 	res, err := userRepo.FindAll()
@@ -77,9 +63,8 @@ if r.Method != http.MethodPost {
 		log.Println("Что то не так с бд")
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode("Not found")
-	}else{
+	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(res)
 	}
-
 }

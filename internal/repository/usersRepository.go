@@ -22,7 +22,7 @@ type UserRepoDB struct {
 
 func (udb *UserRepoDB) FindById(id int) (*models.User, error) {
 	user := &models.User{}
-	row := udb.QueryRow("SELECT * FROM USER AS u WHERE u.id = $1", id)
+	row := udb.QueryRow("SELECT * FROM users AS u WHERE u.id = $1", id)
 	err := row.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Active)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (udb *UserRepoDB) Delete(u *models.User) error {
 	if err != nil {
 		return err
 	}
-	result, err := udb.Exec("update segment set active = false where id = $1 and active = true", u.Id)
+	result, err := udb.Exec("update users set active = false where id = $1 and active = true", u.Id)
 	if err != nil {
 		tx.Rollback()
 		return err

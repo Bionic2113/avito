@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/Bionic2113/avito/internal/models"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 
@@ -39,7 +39,7 @@ func TestFindUserByIdHandler(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	assert.Equal(t, *excepted, actual, "Not equal. First test in FindUserById")
+	require.Equal(t, *excepted, actual, "Not equal. First test in FindUserById")
 
 	userMockDB.EXPECT().FindById(0).Return(nil, errors.New("uuuupss"))
 	m = &Message{0}
@@ -55,7 +55,7 @@ func TestFindUserByIdHandler(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	assert.Equal(t, "Not found", actual2, "Not Equal. First test in FindUserById")
+	require.Equal(t, "Not found", actual2, "Not Equal. First test in FindUserById")
 }
 
 func TestFindAll(t *testing.T) {
@@ -97,7 +97,7 @@ func TestFindAll(t *testing.T) {
 			log.Fatal(err)
 		}
 
-		assert.Equal(t, v, actual, fmt.Sprintf("Not equal in %d test in FindAllUsers", i))
+		require.Equal(t, v, actual, fmt.Sprintf("Not equal in %d test in FindAllUsers", i))
 
 	}
 }

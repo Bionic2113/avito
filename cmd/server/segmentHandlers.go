@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-type SegmentName struct{
-  Name string
+type SegmentName struct {
+	Name string `json:"name"`
 }
 
 // создание сегмента
@@ -43,7 +43,6 @@ func deleteSegmentHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-
 	decoder := json.NewDecoder(r.Body)
 	var req SegmentName
 	err := decoder.Decode(&req)
@@ -55,10 +54,11 @@ func deleteSegmentHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err = segmentRepo.Delete(req.Name)
 	if err != nil {
-		log.Println("не нашел")
+		log.Println("Method deleteSegmentHandler(): Not found")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Error! Not found!")
 	} else {
+		log.Println("Method deleteSegmentHandler(): Found")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode("Success")
 	}
