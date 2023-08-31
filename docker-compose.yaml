@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  localhost:
+    image: postgres:15.1-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: avito_test 
+    volumes:
+      - ./static/avito_test.sql:/docker-entrypoint-initdb.d/init.sql
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - localhost
+    command: sh -c "sleep 10 && ./app"

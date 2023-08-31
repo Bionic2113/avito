@@ -17,7 +17,6 @@ var (
 )
 
 func init() {
-	// db, err := sql.Open("postgres", "user=postgres password=123 dbname=avito_test sslmode=disable")
 	user, pass, port, db_name := "postgres", "123", 5432, "avito_test"
 	db, err := sql.Open(
 		"postgres",
@@ -34,11 +33,4 @@ func init() {
 
 func main() {
 	server.StartServer(userRepo, segmentRepo, userSegmentRepo)
-	// u, err := userSegmentRepo.FindAllById(1, true)
-	// if err != nil{
-	//   log.Fatal(err)
-	// }
-	// for _,v := range u{
-	//   log.Println(v)
-	// }
 }
